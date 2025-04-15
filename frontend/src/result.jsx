@@ -1,5 +1,50 @@
+import  { useEffect, useState } from 'react';
+import QualityPieCharts from './QualityPieCharts';
+import PollutionTracker from './disease';
+ 
+  const Result = () => {
+    const [diseases, setDiseases] = useState([]);
 
-const result = () => {
+    // useEffect(() => {
+    //   const fetchHealthData = async () => {
+    //     const res = await fetch('/api/analyze-health-impact');
+    //     const data = await res.json();
+    //     const parsed = JSON.parse(data.data); // Important!
+    //     setDiseases(parsed.diseases || []);
+    //   };
+  
+    //   fetchHealthData();
+    // }, []);
+
+
+//     import React, { useEffect, useState } from "react";
+// import axios from "axios";
+
+// const Result = () => {
+//   const [data, setData] = useState(null);
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         const response = await axios.get("/api/analyze-health-impact");
+//         setData(response.data);
+//       } catch (error) {
+//         console.error("Error fetching data:", error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchData();
+//   }, []);
+
+//   if (loading) return <div>Loading...</div>;
+//   if (!data) return <div>No data available</div>;
+
+//   const { airQuality, waterQuality, diseases } = data;
+
+
   return (
     <>
   <meta charSet="utf-8" />
@@ -19,6 +64,7 @@ const result = () => {
         impacts, and learn about preventive measures.
       </p>
     </header>
+    <QualityPieCharts />
     <section>
       <div className="flex items-center mb-4">
         <i className="fas fa-sliders-h text-3xl text-blue-500 mr-2"></i>
@@ -90,7 +136,7 @@ const result = () => {
       </div>
     </section>
   </div>
-
+    <PollutionTracker/>
   <>
   <meta charSet="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -330,4 +376,4 @@ const result = () => {
   )
 }
 
-export default result
+export default Result;

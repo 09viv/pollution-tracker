@@ -52,6 +52,16 @@ app.get('/api/water-quality', (req, res) => {
   });
 });
 
+// Fetch locations from the database
+app.get('/api/locations', (req, res) => {
+  const sql = 'SELECT * FROM locations';
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+
 app.use('/api', geminiAnalysisRouter);
 
 app.listen(port, () => {

@@ -1,58 +1,50 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
-// Wildlife occurrence data
-const wildlifeData = [
-  { id: 1, species: "Device", lat: 28.6139, lng: 77.2090, location: "Delhi", icon: "🌳" },
-  { id: 2, species: "Tree", lat: 26.9124, lng: 75.7873, location: "Jaipur", icon: "📡" },
-  { id: 3, species: "Tree", lat: 19.076, lng: 72.8777, location: "Mumbai", icon: "🌳" },
-  { id: 4, species: "Device", lat: 13.0827, lng: 80.2707, location: "Chennai", icon: "📡" }
-];
-
-// Function to create a custom icon
-const createIcon = (emoji) =>
+// Function to create a custom icon for the sensor
+const createIcon = () =>
   L.divIcon({
-    html: `<div style="font-size: 24px;">${emoji}</div>`,
+    html: `<div style="font-size: 24px;">📡</div>`,
     className: "custom-marker",
-    iconSize: [30, 30]
+    iconSize: [30, 30],
   });
 
-const WildlifeMap = () => {
-  useEffect(() => {
-    const legend = L.control({ position: "bottomright" });
+const InstallationMap = () => {
+  const [locations, setLocations] = useState([]);
 
-    legend.onAdd = function () {
-      let div = L.DomUtil.create("div", "legend");
-      div.innerHTML = `
-        <strong>Legend</strong><br/>
-        // 🐅 Tiger<br/>
-        // 🐘 Elephant<br/>
-        // 🦌 Deer
-      `;
-      div.style.background = "white";
-      div.style.padding = "8px";
-      div.style.borderRadius = "5px";
-      div.style.boxShadow = "0px 0px 5px rgba(0,0,0,0.3)";
-      return div;
+  // Fetch the locations from the API
+  useEffect(() => {
+    const fetchLocations = async () => {
+      const res = await fetch("/api/locations");
+      const data = await res.json();
+      setLocations(data); // Set the locations in the state
     };
 
-    return () => legend.remove(); // Cleanup
+    fetchLocations();
   }, []);
 
   return (
-    <MapContainer center={[28.6139, 77.2090]} zoom={5} style={{ height: "500px", width: "100%", zIndex:1 }}>
+    <MapContainer center={[28.6139, 77.2090]} zoom={5} style={{ height: "500px", width: "100%" }}>
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      {wildlifeData.map((data) => (
-        <Marker key={data.id} position={[data.lat, data.lng]} icon={createIcon(data.icon)}>
+      {locations.map((location) => (
+        <Marker
+          key={location.id}
+          position={[location.latitude, location.longitude]}
+          icon={createIcon()}
+        >
           <Popup>
-            <strong>{data.species}</strong>
+            <strong>Sensor Location</strong>
             <br />
-            Location: {data.location}
+            City: {location.city}
+            <br />
+            State: {location.state}
+            <br />
+            Country: {location.country}
           </Popup>
         </Marker>
       ))}
@@ -60,4 +52,4 @@ const WildlifeMap = () => {
   );
 };
 
-export default WildlifeMap;
+export default InstallationMap;

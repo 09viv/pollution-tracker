@@ -154,23 +154,7 @@ const Hero = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block mb-2 text-sm">Date</label>
-                      <input type="date" className="w-full px-4 py-3 rounded-lg bg-neutral-700 focus:ring-2 focus:ring-[#FFB302] outline-none" />
-                    </div>
-                    <div>
-                      <label className="block mb-2 text-sm">Disease</label>
-                      <select className="w-full px-4 py-3 rounded-lg bg-neutral-700 focus:ring-2 focus:ring-[#FFB302] outline-none">
-                        <option>None</option>
-                        <option>Asthma</option>
-                        <option>Bronchitis</option>
-                        <option>Lung Cancer</option>
-                        <option>Cholera</option>
-                        <option>Typhoid Fever</option>
-                      </select>
-                    </div>
-                  </div>
+                 
                   
                   <button className="w-full bg-[#FFB302] text-neutral-900 py-4 rounded-full font-bold hover:bg-[#FFB302]/90 transition-colors">
                     Track Pollution
