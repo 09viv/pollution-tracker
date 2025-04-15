@@ -6,9 +6,10 @@ import 'slick-carousel';
 import noUiSlider from 'nouislider';
 import 'nouislider/distribute/nouislider.css';
 import Map from "./map";
-
+import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
+  const navigate = useNavigate();
     useEffect(() => {
         // Initialize Slick slider
         if (!$('.wildlife-slider').hasClass('slick-initialized')) {
@@ -51,6 +52,26 @@ const Hero = () => {
           });
         }
       }, []);
+      
+      const handleTrackPollution = async () => {
+        if (!navigator.geolocation) {
+          alert("Geolocation is not supported by your browser.");
+          return;
+        }
+      
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const { latitude, longitude } = position.coords;
+      
+          // Call backend API to get nearest location
+          const res = await fetch(`http://localhost:3000/api/nearest-location?lat=${latitude}&lng=${longitude}`);
+          const data = await res.json(); 
+          const { latitude: lat, longitude: lng } = data;
+
+            navigate('/result', {
+            state: { latitude: lat, longitude: lng },
+          });
+        });
+      };
       
 
   return (
@@ -156,9 +177,17 @@ const Hero = () => {
 
                  
                   
-                  <button className="w-full bg-[#FFB302] text-neutral-900 py-4 rounded-full font-bold hover:bg-[#FFB302]/90 transition-colors">
-                    Track Pollution
-                  </button>
+                      <button 
+                      type="button"
+                        onClick={() => {
+                          handleTrackPollution();  // Call your function
+                          // navigate('/result');     // Then navigate
+                        }}
+                        className="w-full bg-[#FFB302] text-neutral-900 py-4 rounded-full font-bold hover:bg-[#FFB302]/90 transition-colors"
+                      >
+                        Track Pollution
+                      </button>
+
                 </form>
               </div>
             </div>

@@ -8,22 +8,45 @@ import dotenv from 'dotenv';
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
 router.get('/analyze-health-impact', async (req, res) => {
   try {
-    // Step 1: Fetch air and water quality data
+    const { lat, lng } = req.query;
+
+    if (!lat || !lng) {
+      return res.status(400).json({ error: 'Latitude and longitude are required.' });
+    }
+
+    // Step 1: Find nearest location from DB
+    const [nearestResult] = await db.query(`
+      SELECT id
+      FROM locations
+      ORDER BY ST_Distance_Sphere(
+        point(longitude, latitude),
+        point(?, ?)
+      ) ASC
+      LIMIT 1
+    `, [lng, lat]);
+
+    if (!nearestResult.length) {
+      return res.status(404).json({ error: 'No location found nearby.' });
+    }
+
+    const locationId = nearestResult[0].id;
+
+    // Step 2: Fetch only air and water data for nearest location
     const [airResults] = await db.query(`
       SELECT location_id, recorded_at, aqi, pm25, pm10, co, no2
       FROM air_quality
+      WHERE location_id = ?
       ORDER BY recorded_at DESC
-      
-    `);
+    `, [locationId]);
 
     const [waterResults] = await db.query(`
       SELECT location_id, recorded_at, wqi
       FROM water_quality
+      WHERE location_id = ?
       ORDER BY recorded_at DESC
-      
-    `);
+    `, [locationId]);
 
-    // Step 2: Create a prompt
+    // Step 3: Construct Gemini prompt with this filtered data
     const prompt = `
       Given the following air and water quality data, list:
       1. Diseases that could arise from these values.
@@ -50,23 +73,21 @@ router.get('/analyze-health-impact', async (req, res) => {
       }
     `;
 
-    // Step 3: Send to Gemini API
+    // Step 4: Call Gemini API
     const response = await axios.post(GEMINI_API_URL, {
-      contents: [{
-        parts: [{ text: prompt }]
-      }]
+      contents: [{ parts: [{ text: prompt }] }]
     });
 
     const geminiResponse = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    // Step 4: Return parsed JSON to frontend
     res.json({ data: geminiResponse });
-
   } catch (error) {
     console.error('Gemini Analysis Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
+
+
 
 export default router;
 

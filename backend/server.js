@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors'; // ✅ import cors
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import geminiAnalysisRouter from './routes/geminiAnalysis.js';
+import nearestLocation from './routes/nearestLocation.js';
 
 dotenv.config();
 
@@ -63,6 +64,7 @@ app.get('/api/locations', (req, res) => {
 
 
 app.use('/api', geminiAnalysisRouter);
+app.use('/api', nearestLocation);
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);

@@ -17,7 +17,7 @@ const InstallationMap = () => {
   // Fetch the locations from the API
   useEffect(() => {
     const fetchLocations = async () => {
-      const res = await fetch("/api/locations");
+      const res = await fetch("http://localhost:3000/api/locations");
       const data = await res.json();
       setLocations(data); // Set the locations in the state
     };

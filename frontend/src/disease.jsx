@@ -1,14 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom"; // ✅ correct import
 import axios from "axios";
 
 export default function PollutionTracker() {
-  const [loading, setLoading] = useState(false);
-  const [diseases, setDiseases] = useState([]);
+  const { state } = useLocation();
+  const { latitude, longitude } = state || {};
 
+  const [diseases, setDiseases] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // ✅ Move the function outside
   const handleTrackPollution = async () => {
+    if (!latitude || !longitude) return;
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:3000/api/analyze-health-impact");
+      const res = await axios.get(`http://localhost:3000/api/analyze-health-impact?lat=${latitude}&lng=${longitude}`);
       const responseText = res.data?.data || "";
 
       const jsonMatch = responseText.match(/```json\n([\s\S]*?)\n```/);
@@ -22,6 +28,10 @@ export default function PollutionTracker() {
     }
   };
 
+  useEffect(() => {
+    handleTrackPollution(); // ✅ Now works
+  }, [latitude, longitude]);
+
   return (
     <>
       <div className="container mx-auto p-4">
@@ -29,7 +39,7 @@ export default function PollutionTracker() {
           onClick={handleTrackPollution}
           className="mb-6 px-6 py-3 bg-yellow-500 text-black font-bold rounded-lg"
         >
-          {loading ? "Loading..." : "Track Pollution"}
+          {loading ? "Loading..." : "Diseases"}
         </button>
 
         {/* AIR RELATED CARD */}
